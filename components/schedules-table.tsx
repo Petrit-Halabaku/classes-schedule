@@ -72,8 +72,8 @@ const dayNames: Record<number, string> = {
   3: "Wednesday",
   4: "Thursday",
   5: "Friday",
-  6: "Saturday",
-  7: "Sunday",
+  // 6: "Saturday",
+  // 7: "Sunday",
 };
 
 export function SchedulesTable({
@@ -230,13 +230,13 @@ export function SchedulesTable({
                   <SelectValue placeholder="Select day" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">Monday</SelectItem>
-                  <SelectItem value="2">Tuesday</SelectItem>
-                  <SelectItem value="3">Wednesday</SelectItem>
-                  <SelectItem value="4">Thursday</SelectItem>
-                  <SelectItem value="5">Friday</SelectItem>
-                  <SelectItem value="6">Saturday</SelectItem>
-                  <SelectItem value="7">Sunday</SelectItem>
+                  <SelectItem value="1">Hënë</SelectItem>
+                  <SelectItem value="2">Marte</SelectItem>
+                  <SelectItem value="3">Mërkure</SelectItem>
+                  <SelectItem value="4">Enjte</SelectItem>
+                  <SelectItem value="5">Premte</SelectItem>
+                  {/* <SelectItem value="6">Shtune</SelectItem> */}
+                  {/* <SelectItem value="7">Diele</SelectItem> */}
                 </SelectContent>
               </Select>
             </div>

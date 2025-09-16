@@ -42,18 +42,18 @@ interface ScheduleTableProps {
   schedules: Schedule[];
 }
 
-const dayNames = {
-  1: "Monday", // Monday
-  2: "Tuesday", // Tuesday
-  3: "Wednesday", // Wednesday
-  4: "Thursday", // Thursday
-  5: "Friday", // Friday
-  6: "Saturday", // Saturday
-  7: "Sunday", // Sunday
-};
+// const dayNames = {
+//   1: "Monday", // Monday
+//   2: "Tuesday", // Tuesday
+//   3: "Wednesday", // Wednesday
+//   4: "Thursday", // Thursday
+//   5: "Friday", // Friday
+//   6: "Saturday", // Saturday
+//   7: "Sunday", // Sunday
+// };
 
 const dayNamesShort = {
-  1: "H", // Monday
+  1: "Ha", // Monday
   2: "Ma", // Tuesday
   3: "Me", // Wednesday
   4: "E", // Thursday
@@ -241,10 +241,8 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
             })}
           </TableBody>
         </Table>
-      </div>;
-      {
-        /* Mobile Card View */
-      }
+      </div>
+      {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {sortedSchedules.map((schedule) => {
           const isCurrentDay = schedule.day_of_week === currentDay;
@@ -356,8 +354,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
             </Card>
           );
         })}
-      </div>;
-      ; ; ; ;
+      </div>
     </>
   );
 }

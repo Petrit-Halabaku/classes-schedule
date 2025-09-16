@@ -35,14 +35,14 @@ interface ScheduleFormProps {
 }
 
 const dayOptions = [
-  { value: "1", label: "Monday" },
-  { value: "2", label: "Tuesday" },
-  { value: "3", label: "Wednesday" },
-  { value: "4", label: "Thursday" },
-  { value: "5", label: "Friday" },
-  { value: "6", label: "Saturday" },
-  { value: "7", label: "Sunday" },
-]
+  { value: "1", label: "Hënë" },
+  { value: "2", label: "Marte" },
+  { value: "3", label: "Mërkure" },
+  { value: "4", label: "Enjte" },
+  { value: "5", label: "Premte" },
+  // { value: "6", label: "Shtune" },
+  // { value: "7", label: "Diele" },
+];
 
 export function ScheduleForm({ courses, instructors, rooms }: ScheduleFormProps) {
   const [isLoading, setIsLoading] = useState(false)
