@@ -215,6 +215,7 @@ export function SchedulesTable({
                   <SelectValue placeholder="Select room" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value={"-"}>-</SelectItem>
                   {rooms.map((r) => (
                     <SelectItem key={r.id} value={r.id}>
                       {r.name} ({r.code})
