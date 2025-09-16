@@ -235,8 +235,8 @@ export function SchedulesTable({
                   <SelectItem value="3">Mërkure</SelectItem>
                   <SelectItem value="4">Enjte</SelectItem>
                   <SelectItem value="5">Premte</SelectItem>
-                  {/* <SelectItem value="6">Shtune</SelectItem> */}
-                  {/* <SelectItem value="7">Diele</SelectItem> */}
+                  <SelectItem value="6">Shtune</SelectItem>
+                  <SelectItem value="7">Diele</SelectItem>
                 </SelectContent>
               </Select>
             </div>

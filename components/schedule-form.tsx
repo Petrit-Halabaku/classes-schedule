@@ -40,8 +40,8 @@ const dayOptions = [
   { value: "3", label: "Mërkure" },
   { value: "4", label: "Enjte" },
   { value: "5", label: "Premte" },
-  // { value: "6", label: "Shtune" },
-  // { value: "7", label: "Diele" },
+  { value: "6", label: "Shtune" },
+  { value: "7", label: "Diele" },
 ];
 
 export function ScheduleForm({ courses, instructors, rooms }: ScheduleFormProps) {

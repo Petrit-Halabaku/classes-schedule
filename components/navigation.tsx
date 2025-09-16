@@ -148,16 +148,16 @@ export function Navigation() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-64">
-                <div className="flex flex-col space-y-4 mt-8">
+                <div className="flex flex-col space-y-4 px-4 mt-10">
                   <NavItems />
                   {user && (
                     <Button
                       variant="ghost"
                       onClick={handleSignOut}
-                      className="justify-start"
+                      className="justify-center"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                      <span className="">Log out</span>
                     </Button>
                   )}
                 </div>
