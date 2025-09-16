@@ -246,7 +246,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
           </TableBody>
         </Table>
       </div>
-      ;{/* Mobile Card View */}
+      {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {sortedSchedules.map((schedule) => {
           const isCurrentDay = schedule.day_of_week === currentDay;
