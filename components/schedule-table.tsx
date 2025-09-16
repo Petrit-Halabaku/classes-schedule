@@ -253,7 +253,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
 
               {/* Time and Room Info */}
               <div className="flex items-center justify-between space-x-3">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <div className="text-xs text-muted-foreground">Orë</div>
@@ -262,7 +262,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <div className="text-xs text-muted-foreground">Salla</div>
