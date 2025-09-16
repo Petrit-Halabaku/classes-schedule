@@ -53,7 +53,7 @@ interface ScheduleTableProps {
 // };
 
 const dayNamesShort = {
-  1: "Ha", // Monday
+  1: "H", // Monday
   2: "Ma", // Tuesday
   3: "Me", // Wednesday
   4: "E", // Thursday
