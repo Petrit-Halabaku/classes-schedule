@@ -190,7 +190,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                   </TableCell> */}
                   <TableCell className="border border-border text-center text-sm">
                     <Badge variant="secondary">
-                      {schedule?.courses?.credits}-{schedule?.courses?.credits}
+                      {schedule?.courses?.credits}
                     </Badge>
                   </TableCell>
                   <TableCell className="border border-border text-center text-sm font-medium">
@@ -241,8 +241,10 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
             })}
           </TableBody>
         </Table>
-      </div>
-      {/* Mobile Card View */}
+      </div>;
+      {
+        /* Mobile Card View */
+      }
       <div className="md:hidden space-y-4">
         {sortedSchedules.map((schedule) => {
           const isCurrentDay = schedule.day_of_week === currentDay;
@@ -324,7 +326,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                   <div className="text-center col-span-1">
                     <div className="text-xs text-muted-foreground">L/U</div>
                     <div className="text-sm font-medium">
-                      {schedule?.courses?.credits}-{schedule?.courses?.credits}
+                      {schedule?.courses?.credits}
                     </div>
                   </div>
                   <div className="text-center items-center col-span-1">
@@ -354,7 +356,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
             </Card>
           );
         })}
-      </div>
+      </div>;
     </>
   );
 }
