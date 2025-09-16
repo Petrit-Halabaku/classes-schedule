@@ -256,7 +256,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
               }`}
             >
               <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-center">
                   <div className="space-y-2">
                     <h3 className="font-semibold text-lg leading-tight">
                       {schedule?.courses?.name}
