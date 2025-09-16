@@ -8,30 +8,37 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 interface Course {
-  id: string
-  name: string
-  code: string
+  id: string;
+  name: string;
+  code: string;
 }
 
 interface Instructor {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 interface Room {
-  id: string
-  name: string
-  code: string
+  id: string;
+  name: string;
+  code: string;
 }
 
 interface ScheduleFormProps {
-  courses: Course[]
-  instructors: Instructor[]
-  rooms: Room[]
+  courses: Course[];
+  instructors: Instructor[];
+  rooms: Room[];
 }
 
 const dayOptions = [
@@ -44,49 +51,60 @@ const dayOptions = [
   { value: "7", label: "Diele" },
 ];
 
-export function ScheduleForm({ courses, instructors, rooms }: ScheduleFormProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
-  const { toast } = useToast()
+export function ScheduleForm({
+  courses,
+  instructors,
+  rooms,
+}: ScheduleFormProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasStartTime, setHasStartTime] = useState(true);
+  const [hasEndTime, setHasEndTime] = useState(true);
+  const router = useRouter();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
-    const formData = new FormData(e.currentTarget)
-    const supabase = createClient()
+    const formData = new FormData(e.currentTarget);
+    const supabase = createClient();
 
     try {
+      const startTimeValue = formData.get("start_time");
+      const endTimeValue = formData.get("end_time");
+
       const { error } = await supabase.from("schedules").insert({
         course_id: formData.get("course_id") as string,
         instructor_id: formData.get("instructor_id") as string,
         room_id: formData.get("room_id") as string,
         day_of_week: Number.parseInt(formData.get("day_of_week") as string),
-        start_time: formData.get("start_time") as string,
-        end_time: formData.get("end_time") as string,
+        start_time: startTimeValue ? (startTimeValue as string) : null,
+        end_time: endTimeValue ? (endTimeValue as string) : null,
         session_type: formData.get("session_type") as string,
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
         title: "Success",
         description: "Schedule added successfully",
-      })
+      });
 
       // Reset form
-      e.currentTarget.reset()
-      router.refresh()
+      e.currentTarget.reset();
+      setHasStartTime(true);
+      setHasEndTime(true);
+      router.refresh();
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to add schedule",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -156,13 +174,49 @@ export function ScheduleForm({ courses, instructors, rooms }: ScheduleFormProps)
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="start_time">Start Time</Label>
-          <Input name="start_time" type="time" required />
+          <div className="flex items-center justify-between">
+            <Label htmlFor="start_time">Start Time</Label>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="no_start_time"
+                checked={!hasStartTime}
+                onCheckedChange={(checked) =>
+                  setHasStartTime(!Boolean(checked))
+                }
+              />
+              <Label htmlFor="no_start_time" className="text-sm font-normal">
+                No start time for now
+              </Label>
+            </div>
+          </div>
+          <Input
+            name="start_time"
+            type="time"
+            required={hasStartTime}
+            disabled={!hasStartTime}
+          />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="end_time">End Time</Label>
-          <Input name="end_time" type="time" required />
+          <div className="flex items-center justify-between">
+            <Label htmlFor="end_time">End Time</Label>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="no_end_time"
+                checked={!hasEndTime}
+                onCheckedChange={(checked) => setHasEndTime(!Boolean(checked))}
+              />
+              <Label htmlFor="no_end_time" className="text-sm font-normal">
+                No end time for now
+              </Label>
+            </div>
+          </div>
+          <Input
+            name="end_time"
+            type="time"
+            required={hasEndTime}
+            disabled={!hasEndTime}
+          />
         </div>
 
         <div className="space-y-2 md:col-span-2">
@@ -185,5 +239,5 @@ export function ScheduleForm({ courses, instructors, rooms }: ScheduleFormProps)
         {isLoading ? "Adding Schedule..." : "Add Schedule"}
       </Button>
     </form>
-  )
+  );
 }

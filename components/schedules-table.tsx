@@ -19,6 +19,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -48,8 +49,8 @@ interface Room {
 interface Schedule {
   id: string;
   day_of_week: number;
-  start_time: string;
-  end_time: string;
+  start_time: string | null;
+  end_time: string | null;
   session_type: string;
   course_id?: string;
   instructor_id?: string;
@@ -85,7 +86,8 @@ export function SchedulesTable({
   const [localSchedules, setLocalSchedules] = useState<Schedule[]>(schedules);
   const { toast } = useToast();
 
-  const formatTime = (time: string) => time.slice(0, 5);
+  const formatTime = (time?: string | null) =>
+    time && time.length >= 5 ? time.slice(0, 5) : "—";
 
   function ScheduleEditDialog({ schedule }: { schedule: Schedule }) {
     const [open, setOpen] = useState(false);
@@ -97,11 +99,15 @@ export function SchedulesTable({
     const [dayOfWeek, setDayOfWeek] = useState<string>(
       String(schedule.day_of_week)
     );
+    const hasInitialStart = Boolean(schedule.start_time);
+    const hasInitialEnd = Boolean(schedule.end_time);
+    const [hasStartTime, setHasStartTime] = useState<boolean>(hasInitialStart);
+    const [hasEndTime, setHasEndTime] = useState<boolean>(hasInitialEnd);
     const [startTime, setStartTime] = useState<string>(
-      formatTime(schedule.start_time)
+      schedule.start_time ? formatTime(schedule.start_time) : ""
     );
     const [endTime, setEndTime] = useState<string>(
-      formatTime(schedule.end_time)
+      schedule.end_time ? formatTime(schedule.end_time) : ""
     );
     const [sessionType, setSessionType] = useState<string>(
       schedule.session_type
@@ -117,8 +123,8 @@ export function SchedulesTable({
           instructor_id: instructorId,
           room_id: roomId,
           day_of_week: Number(dayOfWeek),
-          start_time: startTime,
-          end_time: endTime,
+          start_time: hasStartTime && startTime ? startTime : null,
+          end_time: hasEndTime && endTime ? endTime : null,
           session_type: sessionType,
         };
         const { error } = await supabase
@@ -241,24 +247,58 @@ export function SchedulesTable({
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm" htmlFor="start-time">
-                Start Time
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm" htmlFor="start-time">
+                  Start Time
+                </label>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="edit-no-start-time"
+                    checked={!hasStartTime}
+                    onCheckedChange={(checked) => {
+                      const nextHas = !Boolean(checked);
+                      setHasStartTime(nextHas);
+                      if (!nextHas) setStartTime("");
+                    }}
+                  />
+                  <label htmlFor="edit-no-start-time" className="text-sm">
+                    No ST
+                  </label>
+                </div>
+              </div>
               <Input
                 id="start-time"
                 type="time"
                 value={startTime}
+                disabled={!hasStartTime}
                 onChange={(e) => setStartTime(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm" htmlFor="end-time">
-                End Time
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm" htmlFor="end-time">
+                  End Time
+                </label>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="edit-no-end-time"
+                    checked={!hasEndTime}
+                    onCheckedChange={(checked) => {
+                      const nextHas = !Boolean(checked);
+                      setHasEndTime(nextHas);
+                      if (!nextHas) setEndTime("");
+                    }}
+                  />
+                  <label htmlFor="edit-no-end-time" className="text-sm">
+                    No ET
+                  </label>
+                </div>
+              </div>
               <Input
                 id="end-time"
                 type="time"
                 value={endTime}
+                disabled={!hasEndTime}
                 onChange={(e) => setEndTime(e.target.value)}
               />
             </div>

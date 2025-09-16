@@ -13,8 +13,8 @@ import { Clock, MapPin, User } from "lucide-react";
 interface Schedule {
   id: string;
   day_of_week: number;
-  start_time: string;
-  end_time: string;
+  start_time: string | null;
+  end_time: string | null;
   session_type: string;
   courses: {
     name: string;
@@ -70,11 +70,15 @@ const sessionTypeColors = {
 } as const;
 
 export function ScheduleTable({ schedules }: ScheduleTableProps) {
-  const formatTime = (time: string) => {
+  const formatTime = (time?: string | null) => {
+    if (!time) return "—";
     return time.slice(0, 5); // Remove seconds from HH:MM:SS
   };
-  const getTimeRange = (startTime: string, endTime: string) => {
-    return `${formatTime(startTime)}-${formatTime(endTime)}`;
+  const getTimeRange = (startTime?: string | null, endTime?: string | null) => {
+    const start = formatTime(startTime);
+    const end = formatTime(endTime);
+    if (start === "—" && end === "—") return "—";
+    return `${start}-${end}`;
   };
 
   // Get current day of week (1 = Monday, 7 = Sunday)
@@ -241,10 +245,8 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
             })}
           </TableBody>
         </Table>
-      </div>;
-      {
-        /* Mobile Card View */
-      }
+      </div>
+      ;{/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {sortedSchedules.map((schedule) => {
           const isCurrentDay = schedule.day_of_week === currentDay;
@@ -356,7 +358,8 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
             </Card>
           );
         })}
-      </div>;
+      </div>
+      ;
     </>
   );
 }
