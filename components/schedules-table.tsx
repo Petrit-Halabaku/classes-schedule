@@ -54,9 +54,9 @@ interface Schedule {
   course_id?: string;
   instructor_id?: string;
   room_id?: string | number;
-  course?: { name: string; code: string };
-  instructor?: { name: string };
-  room?: { name: string };
+  courses?: { name: string; code: string };
+  instructors?: { name: string };
+  rooms?: { name: string };
 }
 
 interface SchedulesTableProps {
@@ -144,16 +144,16 @@ export function SchedulesTable({
                         name: courseMap.get(courseId)!.name,
                         code: courseMap.get(courseId)!.code,
                       }
-                    : s.course,
+                    : s.courses,
                   instructor: instructorMap.get(instructorId)
                     ? { name: instructorMap.get(instructorId)!.name }
-                    : s.instructor,
+                    : s.instructors,
                   room:
                     roomId === "0"
                       ? undefined
                       : roomMap.get(roomId)
                       ? { name: roomMap.get(roomId)!.name }
-                      : s.room,
+                      : s.rooms,
                 }
               : s
           )
@@ -316,10 +316,10 @@ export function SchedulesTable({
               {localSchedules.map((schedule) => (
                 <TableRow key={schedule.id}>
                   <TableCell className="font-medium">
-                    {schedule.course?.name} ({schedule.course?.code})
+                    {schedule.courses?.name} ({schedule.courses?.code})
                   </TableCell>
-                  <TableCell>{schedule.instructor?.name}</TableCell>
-                  <TableCell>{schedule.room?.name}</TableCell>
+                  <TableCell>{schedule.instructors?.name}</TableCell>
+                  <TableCell>{schedule.rooms?.name}</TableCell>
                   <TableCell>{dayNames[schedule.day_of_week]}</TableCell>
                   <TableCell>
                     {formatTime(schedule.start_time)} -{" "}
