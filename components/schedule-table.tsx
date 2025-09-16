@@ -43,10 +43,20 @@ interface ScheduleTableProps {
 }
 
 const dayNames = {
-  1: "Me", // Monday
-  2: "E", // Tuesday
-  3: "H", // Wednesday
-  4: "H", // Thursday
+  1: "Monday", // Monday
+  2: "Tuesday", // Tuesday
+  3: "Wednesday", // Wednesday
+  4: "Thursday", // Thursday
+  5: "Friday", // Friday
+  6: "Saturday", // Saturday
+  7: "Sunday", // Sunday
+};
+
+const dayNamesShort = {
+  1: "H", // Monday
+  2: "Ma", // Tuesday
+  3: "Me", // Wednesday
+  4: "E", // Thursday
   5: "P", // Friday
   6: "Sh", // Saturday
   7: "D", // Sunday
@@ -66,6 +76,21 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
   const getTimeRange = (startTime: string, endTime: string) => {
     return `${formatTime(startTime)}-${formatTime(endTime)}`;
   };
+
+  // Get current day of week (1 = Monday, 7 = Sunday)
+  const getCurrentDayOfWeek = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    // Convert Sunday (0) to 7, and shift Monday to 1
+    return dayOfWeek === 0 ? 7 : dayOfWeek;
+  };
+
+  // Sort schedules by day of week (Monday to Friday)
+  const sortedSchedules = [...schedules].sort((a, b) => {
+    return a.day_of_week - b.day_of_week;
+  });
+
+  const currentDay = getCurrentDayOfWeek();
 
   if (schedules.length === 0) {
     return (
@@ -93,18 +118,18 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                   <span>Lënda</span>
                 </div>
               </TableHead>
+              {/* <TableHead className="border border-border font-semibold text-center w-16">
+                O/Z
+              </TableHead> */}
               <TableHead className="border border-border font-semibold text-center w-16">
-                OZ
-              </TableHead>
-              <TableHead className="border border-border font-semibold text-center w-16">
-                OCT
+                L/U
               </TableHead>
               <TableHead className="border border-border font-semibold text-center w-16">
                 ECTS
               </TableHead>
-              <TableHead className="border border-border font-semibold text-center w-16">
+              {/* <TableHead className="border border-border font-semibold text-center w-16">
                 LH
-              </TableHead>
+              </TableHead> */}
               <TableHead className="border border-border font-semibold text-center min-w-[150px]">
                 <div className="flex items-center justify-center space-x-2">
                   <User className="h-4 w-4" />
@@ -129,17 +154,116 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {schedules.map((schedule) => (
-              <TableRow
-                key={schedule?.id}
-                className="hover:bg-muted/30 transition-colors"
-              >
-                <TableCell className="border border-border">
-                  <div className="space-y-1">
-                    <div className="font-medium text-sm">
-                      {schedule?.courses?.name}
+            {sortedSchedules.map((schedule) => {
+              const isCurrentDay = schedule.day_of_week === currentDay;
+              return (
+                <TableRow
+                  key={schedule?.id}
+                  className={`hover:bg-muted/30 transition-colors ${
+                    isCurrentDay ? "bg-blue-50 dark:bg-blue-950/20" : ""
+                  }`}
+                >
+                  <TableCell className="border border-border">
+                    <div className="space-y-1">
+                      <div className="font-medium text-sm">
+                        {schedule?.courses?.name}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline" className="text-xs">
+                          {schedule?.courses?.code}
+                        </Badge>
+                        <Badge
+                          variant={
+                            sessionTypeColors[
+                              schedule?.session_type as keyof typeof sessionTypeColors
+                            ]
+                          }
+                          className="text-xs"
+                        >
+                          {schedule?.session_type}
+                        </Badge>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                  </TableCell>
+                  {/* <TableCell className="border border-border text-center text-sm">
+                    O
+                  </TableCell> */}
+                  <TableCell className="border border-border text-center text-sm">
+                    <Badge variant="secondary">
+                      {schedule?.courses?.credits}-{schedule?.courses?.credits}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="border border-border text-center text-sm font-medium">
+                    <Badge variant="secondary">
+                      {" "}
+                      {schedule?.courses?.ects_credits}
+                    </Badge>
+                  </TableCell>
+                  {/* <TableCell className="border border-border text-center text-sm">
+                    L
+                  </TableCell> */}
+                  <TableCell className="border border-border text-sm">
+                    <div className="space-y-1">
+                      <div className="font-medium">
+                        {schedule?.instructors?.name}
+                      </div>
+                      {schedule?.instructors?.title && (
+                        <div className="text-xs text-muted-foreground">
+                          {schedule?.instructors?.title}
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="border border-border text-center">
+                    <Badge
+                      variant={isCurrentDay ? "default" : "secondary"}
+                      className={`text-sm font-medium ${
+                        isCurrentDay ? "bg-blue-600 text-white" : ""
+                      }`}
+                    >
+                      {
+                        dayNamesShort[
+                          schedule?.day_of_week as keyof typeof dayNamesShort
+                        ]
+                      }
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="border border-border text-center text-sm font-mono">
+                    {getTimeRange(schedule?.start_time, schedule?.end_time)}
+                  </TableCell>
+                  <TableCell className="border border-border text-center">
+                    <Badge variant="outline" className="text-sm">
+                      {schedule?.rooms?.name}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>;
+      {
+        /* Mobile Card View */
+      }
+      <div className="md:hidden space-y-4">
+        {sortedSchedules.map((schedule) => {
+          const isCurrentDay = schedule.day_of_week === currentDay;
+          return (
+            <Card
+              key={schedule?.id}
+              className={`hover:shadow-md transition-shadow ${
+                isCurrentDay
+                  ? "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800"
+                  : ""
+              }`}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-lg leading-tight">
+                      {schedule?.courses?.name}
+                    </h3>
+                    <div className="flex flex-wrap items-center gap-2">
                       <Badge variant="outline" className="text-xs">
                         {schedule?.courses?.code}
                       </Badge>
@@ -155,147 +279,85 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                       </Badge>
                     </div>
                   </div>
-                </TableCell>
-                <TableCell className="border border-border text-center text-sm">
-                  O
-                </TableCell>
-                <TableCell className="border border-border text-center text-sm">
-                  {schedule?.courses?.credits}-{schedule?.courses?.credits}
-                </TableCell>
-                <TableCell className="border border-border text-center text-sm font-medium">
-                  {schedule?.courses?.ects_credits}
-                </TableCell>
-                <TableCell className="border border-border text-center text-sm">
-                  L
-                </TableCell>
-                <TableCell className="border border-border text-sm">
-                  <div className="space-y-1">
-                    <div className="font-medium">
-                      {schedule?.instructors?.name}
-                    </div>
-                    {schedule?.instructors?.title && (
-                      <div className="text-xs text-muted-foreground">
-                        {schedule?.instructors?.title}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Instructor Info */}
+                <div className="flex items-center justify-between space-x-3">
+                  <div className="flex items-center space-x-2">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <div className="font-medium text-sm">
+                        {schedule?.instructors?.name}
                       </div>
-                    )}
+                      {schedule?.instructors?.title && (
+                        <div className="text-xs text-muted-foreground">
+                          {schedule?.instructors?.title}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </TableCell>
-                <TableCell className="border border-border text-center">
-                  <Badge variant="secondary" className="text-sm font-medium">
-                    {dayNames[schedule?.day_of_week as keyof typeof dayNames]}
-                  </Badge>
-                </TableCell>
-                <TableCell className="border border-border text-center text-sm font-mono">
-                  {getTimeRange(schedule?.start_time, schedule?.end_time)}
-                </TableCell>
-                <TableCell className="border border-border text-center">
-                  <Badge variant="outline" className="text-sm">
-                    {schedule?.rooms?.name}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+                </div>
 
-      {/* Mobile Card View */}
-      <div className="md:hidden space-y-4">
-        {schedules.map((schedule) => (
-          <Card
-            key={schedule?.id}
-            className="hover:shadow-md transition-shadow"
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-lg leading-tight">
-                    {schedule?.courses?.name}
-                  </h3>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="outline" className="text-xs">
-                      {schedule?.courses?.code}
-                    </Badge>
+                {/* Time and Room Info */}
+                <div className="flex items-center justify-between space-x-3">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <div className="text-xs text-muted-foreground">Orë</div>
+                      <div className="text-sm font-mono">
+                        {getTimeRange(schedule?.start_time, schedule?.end_time)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <div className="text-xs text-muted-foreground">Salla</div>
+                      <Badge variant="outline" className="text-xs">
+                        {schedule?.rooms?.name}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Course Details */}
+                <div className="grid grid-cols-3 gap-4 pt-2 border-t">
+                  <div className="text-center col-span-1">
+                    <div className="text-xs text-muted-foreground">L/U</div>
+                    <div className="text-sm font-medium">
+                      {schedule?.courses?.credits}-{schedule?.courses?.credits}
+                    </div>
+                  </div>
+                  <div className="text-center items-center col-span-1">
+                    <div className="text-xs text-muted-foreground">Dita</div>
+
                     <Badge
-                      variant={
-                        sessionTypeColors[
-                          schedule?.session_type as keyof typeof sessionTypeColors
+                      variant={isCurrentDay ? "default" : "secondary"}
+                      className={`text-sm font-medium ${
+                        isCurrentDay ? "bg-blue-600 text-white" : ""
+                      }`}
+                    >
+                      {
+                        dayNamesShort[
+                          schedule?.day_of_week as keyof typeof dayNamesShort
                         ]
                       }
-                      className="text-xs"
-                    >
-                      {schedule?.session_type}
                     </Badge>
                   </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Instructor Info */}
-              <div className="flex items-center justify-between space-x-3">
-                <div className="flex items-center space-x-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <div className="font-medium text-sm">
-                      {schedule?.instructors?.name}
-                    </div>
-                    {schedule?.instructors?.title && (
-                      <div className="text-xs text-muted-foreground">
-                        {schedule?.instructors?.title}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <Badge variant="secondary" className="text-sm font-medium">
-                  {dayNames[schedule?.day_of_week as keyof typeof dayNames]}
-                </Badge>
-              </div>
-
-              {/* Time and Room Info */}
-              <div className="flex items-center justify-between space-x-3">
-                <div className="flex items-center space-x-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <div className="text-xs text-muted-foreground">Orë</div>
-                    <div className="text-sm font-mono">
-                      {getTimeRange(schedule?.start_time, schedule?.end_time)}
+                  <div className="text-center col-span-1">
+                    <div className="text-xs text-muted-foreground">ECTS</div>
+                    <div className="text-sm font-medium">
+                      {schedule?.courses?.ects_credits}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <div className="text-xs text-muted-foreground">Salla</div>
-                    <Badge variant="outline" className="text-xs">
-                      {schedule?.rooms?.name}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-
-              {/* Course Details */}
-              <div className="grid grid-cols-3 gap-4 pt-2 border-t">
-                <div className="text-center col-span-1">
-                  <div className="text-xs text-muted-foreground">OZ</div>
-                  <div className="text-sm font-medium">O</div>
-                </div>
-                <div className="text-center col-span-1">
-                  <div className="text-xs text-muted-foreground">OCT</div>
-                  <div className="text-sm font-medium">
-                    {schedule?.courses?.credits}-{schedule?.courses?.credits}
-                  </div>
-                </div>
-                <div className="text-center col-span-1">
-                  <div className="text-xs text-muted-foreground">ECTS</div>
-                  <div className="text-sm font-medium">
-                    {schedule?.courses?.ects_credits}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>;
+      ; ; ; ;
     </>
   );
 }
