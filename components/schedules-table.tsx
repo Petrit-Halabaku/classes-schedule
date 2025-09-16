@@ -53,7 +53,7 @@ interface Schedule {
   session_type: string;
   course_id?: string;
   instructor_id?: string;
-  room_id?: string;
+  room_id?: string | number;
   course?: { name: string; code: string };
   instructor?: { name: string };
   room?: { name: string };
@@ -93,7 +93,9 @@ export function SchedulesTable({
     const [instructorId, setInstructorId] = useState<string>(
       schedule.instructor_id || ""
     );
-    const [roomId, setRoomId] = useState<string>(schedule.room_id || "");
+    const [roomId, setRoomId] = useState<string>(
+      String(schedule.room_id ?? "")
+    );
     const [dayOfWeek, setDayOfWeek] = useState<string>(
       String(schedule.day_of_week)
     );
@@ -115,7 +117,7 @@ export function SchedulesTable({
         const payload = {
           course_id: courseId,
           instructor_id: instructorId,
-          room_id: roomId,
+          room_id: roomId === "0" ? 0 : roomId,
           day_of_week: Number(dayOfWeek),
           start_time: startTime,
           end_time: endTime,
@@ -146,9 +148,12 @@ export function SchedulesTable({
                   instructor: instructorMap.get(instructorId)
                     ? { name: instructorMap.get(instructorId)!.name }
                     : s.instructor,
-                  room: roomMap.get(roomId)
-                    ? { name: roomMap.get(roomId)!.name }
-                    : s.room,
+                  room:
+                    roomId === "0"
+                      ? undefined
+                      : roomMap.get(roomId)
+                      ? { name: roomMap.get(roomId)!.name }
+                      : s.room,
                 }
               : s
           )
@@ -215,7 +220,7 @@ export function SchedulesTable({
                   <SelectValue placeholder="Select room" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={"0"}>-</SelectItem>
+                  <SelectItem value="0">-</SelectItem>
                   {rooms.map((r) => (
                     <SelectItem key={r.id} value={r.id}>
                       {r.name} ({r.code})
