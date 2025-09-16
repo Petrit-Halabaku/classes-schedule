@@ -228,29 +228,31 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                     </Badge>
                   </div>
                 </div>
-                <Badge variant="secondary" className="text-sm font-medium">
-                  {dayNames[schedule?.day_of_week as keyof typeof dayNames]}
-                </Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Instructor Info */}
-              <div className="flex items-center space-x-3">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <div className="font-medium text-sm">
-                    {schedule?.instructors?.name}
-                  </div>
-                  {schedule?.instructors?.title && (
-                    <div className="text-xs text-muted-foreground">
-                      {schedule?.instructors?.title}
+              <div className="flex items-center justify-between space-x-3">
+                <div className="flex items-center space-x-2">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <div className="font-medium text-sm">
+                      {schedule?.instructors?.name}
                     </div>
-                  )}
+                    {schedule?.instructors?.title && (
+                      <div className="text-xs text-muted-foreground">
+                        {schedule?.instructors?.title}
+                      </div>
+                    )}
+                  </div>
                 </div>
+                <Badge variant="secondary" className="text-sm font-medium">
+                  {dayNames[schedule?.day_of_week as keyof typeof dayNames]}
+                </Badge>
               </div>
 
               {/* Time and Room Info */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center justify-between space-x-3">
                 <div className="flex items-center space-x-3">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <div>
