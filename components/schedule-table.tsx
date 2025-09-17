@@ -356,7 +356,6 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
           );
         })}
       </div>
-      ;
     </>
   );
 }
