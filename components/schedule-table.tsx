@@ -126,7 +126,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                 O/Z
               </TableHead> */}
               <TableHead className="border border-border font-semibold text-center w-16">
-                L/U
+                Ligjerate/Ushrime
               </TableHead>
               <TableHead className="border border-border font-semibold text-center w-16">
                 ECTS
@@ -177,11 +177,13 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                           {schedule?.courses?.code}
                         </Badge>
                         <Badge
-                          variant={
-                            sessionTypeColors[
-                              schedule?.session_type as keyof typeof sessionTypeColors
-                            ]
-                          }
+                          variant="outline"
+                          // variant=
+                          // {
+                          //   sessionTypeColors[
+                          //     schedule?.session_type as keyof typeof sessionTypeColors
+                          //   ]
+                          // }
                           className="text-xs"
                         >
                           {schedule?.session_type}
@@ -324,7 +326,9 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                 {/* Course Details */}
                 <div className="grid grid-cols-3 gap-4 pt-2 border-t">
                   <div className="text-center col-span-1">
-                    <div className="text-xs text-muted-foreground">L/U</div>
+                    <div className="text-xs text-muted-foreground">
+                      Ligjerate/Ushrime
+                    </div>
                     <div className="text-sm font-medium">
                       {schedule?.courses?.credits}
                     </div>
