@@ -339,7 +339,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                     <div className="text-xs text-muted-foreground">
                       {getSessionLabelFromCode(schedule?.courses?.code)}
                     </div>
-                    <div className="text-sm font-medium">
+                    <div className="text-xs font-normal">
                       {schedule?.courses?.credits} x 45min
                     </div>
                   </div>
