@@ -253,13 +253,13 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
           return (
             <Card
               key={schedule?.id}
-              className={`hover:shadow-md transition-shadow ${
+              className={`hover:shadow-md gap-3 transition-shadow ${
                 isCurrentDay
                   ? "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800"
                   : ""
               }`}
             >
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-1">
                 <div className="flex items-start justify-center">
                   <div className="space-y-2">
                     <h3 className="font-semibold text-lg leading-tight">
