@@ -269,14 +269,12 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                       <Badge variant="outline" className="text-xs">
                         {schedule?.courses?.code}
                       </Badge>
-                      <Badge
-                        variant={
+                      <Badge variant="outline" className="text-xs">
+                        {/* {
                           sessionTypeColors[
                             schedule?.session_type as keyof typeof sessionTypeColors
                           ]
-                        }
-                        className="text-xs"
-                      >
+                        } */}
                         {schedule?.session_type}
                       </Badge>
                     </div>
@@ -307,7 +305,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <div>
                       <div className="text-xs text-muted-foreground">Orë</div>
-                      <div className="text-sm font-mono">
+                      <div className="text-md font-mono font-bold">
                         {getTimeRange(schedule?.start_time, schedule?.end_time)}
                       </div>
                     </div>
@@ -333,10 +331,9 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                   </div>
                   <div className="text-center items-center col-span-1">
                     <div className="text-xs text-muted-foreground">Dita</div>
-
                     <Badge
                       variant={isCurrentDay ? "default" : "secondary"}
-                      className={`text-sm font-medium ${
+                      className={`text-md font-bold ${
                         isCurrentDay ? "bg-blue-600 text-white" : ""
                       }`}
                     >
