@@ -70,6 +70,13 @@ const sessionTypeColors = {
 } as const;
 
 export function ScheduleTable({ schedules }: ScheduleTableProps) {
+  const getSessionLabelFromCode = (code?: string | null) => {
+    if (!code) return "Ligjerate/Ushrime";
+    const trimmed = code.trim();
+    if (trimmed.endsWith("001")) return "Ligjerate";
+    if (trimmed.endsWith("002")) return "Ushrime";
+    return "Ligjerate/Ushrime";
+  };
   const formatTime = (time?: string | null) => {
     if (!time) return "—";
     return time.slice(0, 5); // Remove seconds from HH:MM:SS
@@ -195,8 +202,11 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                     O
                   </TableCell> */}
                   <TableCell className="border border-border text-center text-sm">
-                    <Badge variant="secondary">
-                      {schedule?.courses?.credits}
+                    <Badge variant="secondary" className="flex flex-col">
+                      <span>
+                        {getSessionLabelFromCode(schedule?.courses?.code)}
+                      </span>
+                      <span>{schedule?.courses?.credits} x 45min</span>
                     </Badge>
                   </TableCell>
                   <TableCell className="border border-border text-center text-sm font-medium">
@@ -327,10 +337,10 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                 <div className="grid grid-cols-3 gap-4 pt-2 border-t">
                   <div className="text-center col-span-1">
                     <div className="text-xs text-muted-foreground">
-                      Ligjerate/Ushrime
+                      {getSessionLabelFromCode(schedule?.courses?.code)}
                     </div>
                     <div className="text-sm font-medium">
-                      {schedule?.courses?.credits}
+                      {schedule?.courses?.credits} x 45min
                     </div>
                   </div>
                   <div className="text-center items-center col-span-1">
