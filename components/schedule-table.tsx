@@ -305,7 +305,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <div>
                       <div className="text-xs text-muted-foreground">Orë</div>
-                      <div className="text-md font-mono font-bold">
+                      <div className="text-md font-bold">
                         {getTimeRange(schedule?.start_time, schedule?.end_time)}
                       </div>
                     </div>
