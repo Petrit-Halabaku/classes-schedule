@@ -360,7 +360,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                   </div>
                   <div className="text-center col-span-1">
                     <div className="text-xs text-muted-foreground">ECTS</div>
-                    <div className="text-sm font-medium">
+                    <div className="text-xs font-medium">
                       {schedule?.courses?.ects_credits}
                     </div>
                   </div>
