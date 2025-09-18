@@ -333,7 +333,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                     {/* <MapPin className="h-4 w-4 text-muted-foreground" /> */}
                     <div>
                       <div className="text-xs text-muted-foreground">Salla</div>
-                      <Badge variant="outline" className="text-xs font-medium">
+                      <Badge variant="outline" className="text-md font-bold">
                         {schedule?.rooms?.name}
                       </Badge>
                     </div>
