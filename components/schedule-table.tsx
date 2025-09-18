@@ -88,6 +88,18 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
     return `${start}-${end}`;
   };
 
+  const getDateForWeekday = (dayOfWeek: number) => {
+    const now = new Date();
+    const currentIsoDay = now.getDay() === 0 ? 7 : now.getDay();
+    const diff = dayOfWeek - currentIsoDay;
+    const target = new Date(now);
+    target.setDate(now.getDate() + diff);
+    const month = String(target.getMonth() + 1).padStart(2, "0");
+    const day = String(target.getDate()).padStart(2, "0");
+    const year = target.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
   // Get current day of week (1 = Monday, 7 = Sunday)
   const getCurrentDayOfWeek = () => {
     const today = new Date();
@@ -308,6 +320,9 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                         </div>
                       )}
                     </div>
+                  </div>
+                  <div className="font-medium text-sm">
+                    {getDateForWeekday(schedule?.day_of_week)}
                   </div>
                 </div>
 

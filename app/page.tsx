@@ -1,6 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { ScheduleTable } from "@/components/schedule-table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -38,9 +44,12 @@ export default async function HomePage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">
-              PROGRAME: SHKENCA KOMPJUTERIKE (MASTER)
+            <CardTitle className="text-xl text-center font-semibold">
+              PROGRAMI: SHKENCA KOMPJUTERIKE (MASTER)
             </CardTitle>
+            <CardDescription className="text-center text-muted-foreground">
+              Ligjeratat fillojne me daten 15 Stator 2025
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ScheduleTable schedules={data} />

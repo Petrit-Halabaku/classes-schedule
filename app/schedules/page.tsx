@@ -39,7 +39,7 @@ export default async function SchedulesPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-xl font-semibold">
-              PROGRAME: SHKENCA KOMPJUTERIKE (MASTER)
+              PROGRAMI: SHKENCA KOMPJUTERIKE (MASTER)
             </CardTitle>
           </CardHeader>
           <CardContent>
