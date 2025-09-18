@@ -307,31 +307,32 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Instructor Info */}
-                <div className="flex items-center justify-between space-x-3">
+                <div className="flex items-start justify-between space-x-3">
                   <div className="flex items-center space-x-2">
                     {/* <User className="h-4 w-4 text-muted-foreground" /> */}
                     <div>
-                      <div className="font-medium text-sm">
-                        {schedule?.instructors?.name}
-                      </div>
                       {schedule?.instructors?.title && (
                         <div className="text-xs text-muted-foreground">
                           {schedule?.instructors?.title}
                         </div>
                       )}
+                      <div className="font-medium text-sm">
+                        {schedule?.instructors?.name}
+                      </div>
                     </div>
                   </div>
                   <div className="font-medium text-sm">
+                    <div className="text-xs text-muted-foreground">Data</div>
                     {getDateForWeekday(schedule?.day_of_week)}
                   </div>
                 </div>
 
                 {/* Time and Room Info */}
-                <div className="flex items-center justify-between space-x-3">
+                <div className="flex items-start justify-between space-x-3">
                   <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    {/* <Clock className="h-4 w-4 text-muted-foreground" /> */}
                     <div>
-                      <div className="text-xs text-muted-foreground">Orë</div>
+                      <div className="text-xs text-muted-foreground">Ora</div>
                       <div className="text-md font-bold">
                         {getTimeRange(schedule?.start_time, schedule?.end_time)}
                       </div>
