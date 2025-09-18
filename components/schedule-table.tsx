@@ -330,21 +330,21 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                 {/* Time and Room Info */}
                 <div className="flex items-start justify-between space-x-3">
                   <div className="flex items-center space-x-2">
+                    {/* <MapPin className="h-4 w-4 text-muted-foreground" /> */}
+                    <div>
+                      <div className="text-xs text-muted-foreground">Salla</div>
+                      <Badge variant="outline" className="text-xs font-medium">
+                        {schedule?.rooms?.name}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
                     {/* <Clock className="h-4 w-4 text-muted-foreground" /> */}
                     <div>
                       <div className="text-xs text-muted-foreground">Ora</div>
                       <div className="text-md font-bold">
                         {getTimeRange(schedule?.start_time, schedule?.end_time)}
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {/* <MapPin className="h-4 w-4 text-muted-foreground" /> */}
-                    <div>
-                      <div className="text-xs text-muted-foreground">Salla</div>
-                      <Badge variant="outline" className="text-xs">
-                        {schedule?.rooms?.name}
-                      </Badge>
                     </div>
                   </div>
                 </div>
