@@ -309,7 +309,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                 {/* Instructor Info */}
                 <div className="flex items-center justify-between space-x-3">
                   <div className="flex items-center space-x-2">
-                    <User className="h-4 w-4 text-muted-foreground" />
+                    {/* <User className="h-4 w-4 text-muted-foreground" /> */}
                     <div>
                       <div className="font-medium text-sm">
                         {schedule?.instructors?.name}
