@@ -11,6 +11,17 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -166,6 +177,59 @@ export function RoomsTable({ rooms }: RoomsTableProps) {
     );
   }
 
+  function RoomDeleteDialog({ room }: { room: Room }) {
+    const [open, setOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const onDelete = async () => {
+      setIsDeleting(true);
+      const supabase = createClient();
+      try {
+        const { error } = await supabase
+          .from("rooms")
+          .delete()
+          .eq("id", room.id);
+        if (error) throw error;
+        setLocalRooms((prev) => prev.filter((r) => r.id !== room.id));
+        toast({ title: "Deleted", description: "Room removed" });
+        setOpen(false);
+      } catch (e) {
+        toast({
+          title: "Error",
+          description: "Failed to delete room. It may be in use by schedules.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsDeleting(false);
+      }
+    };
+
+    return (
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogTrigger asChild>
+          <Button variant="destructive" size="sm">
+            Delete
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete room?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete room "
+              {room.name}".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onDelete} disabled={isDeleting}>
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -191,7 +255,10 @@ export function RoomsTable({ rooms }: RoomsTableProps) {
                   <TableCell>{room.capacity || "—"}</TableCell>
                   <TableCell>{room.room_type || "—"}</TableCell>
                   <TableCell>
-                    <RoomEditDialog room={room} />
+                    <div className="flex gap-2">
+                      <RoomEditDialog room={room} />
+                      <RoomDeleteDialog room={room} />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

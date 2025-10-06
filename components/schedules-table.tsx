@@ -11,6 +11,17 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -327,6 +338,59 @@ export function SchedulesTable({
     );
   }
 
+  function ScheduleDeleteDialog({ schedule }: { schedule: Schedule }) {
+    const [open, setOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const onDelete = async () => {
+      setIsDeleting(true);
+      const supabase = createClient();
+      try {
+        const { error } = await supabase
+          .from("schedules")
+          .delete()
+          .eq("id", schedule.id);
+        if (error) throw error;
+        setLocalSchedules((prev) => prev.filter((s) => s.id !== schedule.id));
+        toast({ title: "Deleted", description: "Schedule removed" });
+        setOpen(false);
+      } catch (e) {
+        toast({
+          title: "Error",
+          description: "Failed to delete schedule",
+          variant: "destructive",
+        });
+      } finally {
+        setIsDeleting(false);
+      }
+    };
+
+    return (
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogTrigger asChild>
+          <Button variant="destructive" size="sm">
+            Delete
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete schedule?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              selected schedule.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onDelete} disabled={isDeleting}>
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -361,7 +425,10 @@ export function SchedulesTable({
                   </TableCell>
                   <TableCell>{schedule.session_type}</TableCell>
                   <TableCell>
-                    <ScheduleEditDialog schedule={schedule} />
+                    <div className="flex gap-2">
+                      <ScheduleEditDialog schedule={schedule} />
+                      <ScheduleDeleteDialog schedule={schedule} />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

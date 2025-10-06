@@ -11,6 +11,17 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -152,6 +163,62 @@ export function InstructorsTable({ instructors }: InstructorsTableProps) {
     );
   }
 
+  function InstructorDeleteDialog({ instructor }: { instructor: Instructor }) {
+    const [open, setOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const onDelete = async () => {
+      setIsDeleting(true);
+      const supabase = createClient();
+      try {
+        const { error } = await supabase
+          .from("instructors")
+          .delete()
+          .eq("id", instructor.id);
+        if (error) throw error;
+        setLocalInstructors((prev) =>
+          prev.filter((i) => i.id !== instructor.id)
+        );
+        toast({ title: "Deleted", description: "Instructor removed" });
+        setOpen(false);
+      } catch (e) {
+        toast({
+          title: "Error",
+          description:
+            "Failed to delete instructor. They may be referenced by schedules.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsDeleting(false);
+      }
+    };
+
+    return (
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogTrigger asChild>
+          <Button variant="destructive" size="sm">
+            Delete
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete instructor?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete "
+              {instructor.name}".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onDelete} disabled={isDeleting}>
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -177,7 +244,10 @@ export function InstructorsTable({ instructors }: InstructorsTableProps) {
                   <TableCell>{instructor.title || "—"}</TableCell>
                   <TableCell>{instructor.email || "—"}</TableCell>
                   <TableCell>
-                    <InstructorEditDialog instructor={instructor} />
+                    <div className="flex gap-2">
+                      <InstructorEditDialog instructor={instructor} />
+                      <InstructorDeleteDialog instructor={instructor} />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
