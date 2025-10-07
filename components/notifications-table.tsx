@@ -96,6 +96,7 @@ export function NotificationsTable({
       <TableHeader>
         <TableRow>
           <TableHead>Title</TableHead>
+          <TableHead>Message</TableHead>
           <TableHead>Severity</TableHead>
           <TableHead>Active</TableHead>
           <TableHead>Window</TableHead>
@@ -106,6 +107,7 @@ export function NotificationsTable({
         {notifications.map((n) => (
           <TableRow key={n.id}>
             <TableCell className="font-medium">{n.title}</TableCell>
+            <TableCell className="uppercase text-xs">{n.message}</TableCell>
             <TableCell className="uppercase text-xs">{n.severity}</TableCell>
             <TableCell>
               <Switch
