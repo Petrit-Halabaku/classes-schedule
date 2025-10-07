@@ -20,7 +20,7 @@ export async function NotificationsBanner() {
   if (!data || data.length === 0) return null;
 
   return (
-    <div className="space-y-3 w-full md:w-1/2  mx-auto">
+    <div className="space-y-3 w-full md:w-1/2 px-4 mx-auto">
       {data
         .filter((n: Notification) => n.is_active)
         .map((n: Notification) => (
