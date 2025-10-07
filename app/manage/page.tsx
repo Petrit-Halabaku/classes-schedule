@@ -10,6 +10,8 @@ import { InstructorsTable } from "@/components/instructors-table";
 import { RoomsTable } from "@/components/rooms-table";
 import { SchedulesTable } from "@/components/schedules-table";
 import { ProtectedRoute } from "@/components/auth/protected-route";
+import { NotificationForm } from "@/components/notification-form";
+import { NotificationsTable } from "@/components/notifications-table";
 
 export default async function ManagePage() {
   const supabase = await createClient();
@@ -21,6 +23,7 @@ export default async function ManagePage() {
     { data: rooms },
     { data: courses },
     { data: schedules },
+    { data: notifications },
   ] = await Promise.all([
     supabase.from("programs").select("*").order("name"),
     supabase.from("instructors").select("*").order("name"),
@@ -38,6 +41,10 @@ export default async function ManagePage() {
       )
       .order("day_of_week")
       .order("start_time"),
+    supabase
+      .from("notifications")
+      .select("*")
+      .order("created_at", { ascending: false }),
   ]);
 
   return (
@@ -54,11 +61,12 @@ export default async function ManagePage() {
           </div>
 
           <Tabs defaultValue="courses" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="courses">Courses</TabsTrigger>
               <TabsTrigger value="instructors">Instructors</TabsTrigger>
               <TabsTrigger value="rooms">Rooms</TabsTrigger>
               <TabsTrigger value="schedules">Schedules</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
             </TabsList>
 
             <TabsContent value="courses" className="space-y-6">
@@ -116,6 +124,18 @@ export default async function ManagePage() {
                 instructors={instructors || []}
                 rooms={rooms || []}
               />
+            </TabsContent>
+
+            <TabsContent value="notifications" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Create Notification</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <NotificationForm />
+                </CardContent>
+              </Card>
+              <NotificationsTable notifications={notifications || []} />
             </TabsContent>
           </Tabs>
         </div>

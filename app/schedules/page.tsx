@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { ScheduleTable } from "@/components/schedule-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { NotificationsBanner } from "@/components/notifications-banner";
 
 export default async function SchedulesPage() {
   const supabase = await createClient();
@@ -35,6 +36,9 @@ export default async function SchedulesPage() {
             Academic Year 2025 - Computer Science Master's Program
           </p>
         </div>
+
+        {/* Notifications section under Academic Year */}
+        <NotificationsBanner />
 
         <Card>
           <CardHeader>
