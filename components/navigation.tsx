@@ -51,17 +51,18 @@ export function Navigation() {
 
   const navItems = [
     {
-      href: "/",
-      label: "Schedule View",
-      icon: Calendar,
+      href: "/manage",
+      label: "Manage",
+      icon: Settings,
     },
     ...(user
       ? [
           {
-            href: "/manage",
-            label: "Manage",
-            icon: Settings,
+            href: "/",
+            label: "Schedule View",
+            icon: Calendar,
           },
+
           {
             href: "/dashboard",
             label: "Dashboard",
