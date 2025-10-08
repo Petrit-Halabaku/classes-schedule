@@ -38,7 +38,7 @@ export async function NotificationsBanner() {
             })}
           >
             <AlertTitle>{n.title}</AlertTitle>
-            <AlertDescription className="text-black text-lg md:text-md font-bold py-2">
+            <AlertDescription className="text-red-500 text-lg font-bold py-2">
               {n.message}
             </AlertDescription>
           </Alert>
