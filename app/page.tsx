@@ -31,6 +31,19 @@ export default async function HomePage() {
     return <div>Error loading schedule data</div>;
   }
 
+  // Determine latest update time across schedules
+  const latestUpdatedAtIso = data
+    .map((s: any) => s?.updated_at || s?.created_at)
+    .filter(Boolean)
+    .sort()
+    .pop();
+  const lastUpdatedDisplay = latestUpdatedAtIso
+    ? new Date(latestUpdatedAtIso).toLocaleString("en-EN", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      })
+    : null;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -53,12 +66,22 @@ export default async function HomePage() {
             </CardTitle>
             <CardDescription className="text-center text-muted-foreground">
               Ligjeratat fillojne me daten 15 Stator 2025
+              {lastUpdatedDisplay && (
+                <span className="block mt-1 text-xs">
+                  Last Updated: {lastUpdatedDisplay}
+                </span>
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <ScheduleTable schedules={data} />
           </CardContent>
         </Card>
+        <div className="pt-12">
+          <p className="text-center text-[10px] text-muted-foreground">
+            Property of Petrit Halabaku
+          </p>
+        </div>
       </div>
     </div>
   );
