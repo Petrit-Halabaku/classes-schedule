@@ -136,7 +136,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
         <Table className="min-w-full border-collapse">
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="border border-border font-semibold text-center min-w-[300px]">
+              <TableHead className="border text-base border-border font-semibold text-center min-w-[300px]">
                 <div className="flex items-center justify-center space-x-2">
                   <span>Lënda</span>
                 </div>
@@ -144,31 +144,31 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
               {/* <TableHead className="border border-border font-semibold text-center w-16">
                 O/Z
               </TableHead> */}
-              <TableHead className="border border-border font-semibold text-center w-16">
+              <TableHead className="border text-base border-border font-semibold text-center w-16">
                 Ligjerate/Ushrime
               </TableHead>
-              <TableHead className="border border-border font-semibold text-center w-16">
+              <TableHead className="border text-base border-border font-semibold text-center w-16">
                 ECTS
               </TableHead>
               {/* <TableHead className="border border-border font-semibold text-center w-16">
                 LH
               </TableHead> */}
-              <TableHead className="border border-border font-semibold text-center min-w-[150px]">
+              <TableHead className="border text-base border-border font-semibold text-center min-w-[150px]">
                 <div className="flex items-center justify-center space-x-2">
                   <User className="h-4 w-4" />
                   <span>Mësimdhënës</span>
                 </div>
               </TableHead>
-              <TableHead className="border border-border font-semibold text-center w-16">
+              <TableHead className="border text-base border-border font-semibold text-center w-16">
                 Ditë
               </TableHead>
-              <TableHead className="border border-border font-semibold text-center min-w-[120px]">
+              <TableHead className="border text-base border-border font-semibold text-center min-w-[120px]">
                 <div className="flex items-center justify-center space-x-2">
                   <Clock className="h-4 w-4" />
                   <span>Orë</span>
                 </div>
               </TableHead>
-              <TableHead className="border border-border font-semibold text-center w-20">
+              <TableHead className="border text-base border-border font-semibold text-center w-20">
                 <div className="flex items-center justify-center space-x-2">
                   <MapPin className="h-4 w-4" />
                   <span>Salla</span>
@@ -188,7 +188,7 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                 >
                   <TableCell className="border border-border">
                     <div className="space-y-1">
-                      <div className="font-medium text-sm">
+                      <div className="font-medium text-base">
                         {schedule?.courses?.name}
                       </div>
                       <div className="flex items-center space-x-2">
@@ -213,16 +213,18 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                   {/* <TableCell className="border border-border text-center text-sm">
                     O
                   </TableCell> */}
-                  <TableCell className="border border-border text-center text-sm">
-                    <Badge variant="secondary" className="flex flex-col">
-                      <span>
+                  <TableCell className="border border-border text-center text-base">
+                    <Badge variant="secondary" className="flex w-full flex-col">
+                      <span className="text-sm">
                         {getSessionLabelFromCode(schedule?.courses?.code)}
                       </span>
-                      <span>{schedule?.courses?.credits} x 45min</span>
+                      <span className="text-sm">
+                        {schedule?.courses?.credits} x 45min
+                      </span>
                     </Badge>
                   </TableCell>
-                  <TableCell className="border border-border text-center text-sm font-medium">
-                    <Badge variant="secondary">
+                  <TableCell className="border border-border text-center text-base font-medium">
+                    <Badge variant="secondary" className="text-base">
                       {" "}
                       {schedule?.courses?.ects_credits}
                     </Badge>
@@ -230,9 +232,9 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                   {/* <TableCell className="border border-border text-center text-sm">
                     L
                   </TableCell> */}
-                  <TableCell className="border border-border text-sm">
+                  <TableCell className="border border-border ">
                     <div className="space-y-1">
-                      <div className="font-medium">
+                      <div className="font-medium text-base">
                         {schedule?.instructors?.name}
                       </div>
                       {schedule?.instructors?.title && (
@@ -242,10 +244,10 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="border border-border text-center">
+                  <TableCell className="border border-border text-center ">
                     <Badge
                       variant={isCurrentDay ? "default" : "secondary"}
-                      className={`text-sm font-medium ${
+                      className={`text-base font-medium ${
                         isCurrentDay ? "bg-blue-600 text-white" : ""
                       }`}
                     >
@@ -256,11 +258,11 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                       }
                     </Badge>
                   </TableCell>
-                  <TableCell className="border border-border text-center text-sm font-mono">
+                  <TableCell className="border border-border text-center text-base font-mono">
                     {getTimeRange(schedule?.start_time, schedule?.end_time)}
                   </TableCell>
                   <TableCell className="border border-border text-center">
-                    <Badge variant="outline" className="text-sm">
+                    <Badge variant="outline" className="text-base">
                       {schedule?.rooms?.name}
                     </Badge>
                   </TableCell>
