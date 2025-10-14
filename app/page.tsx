@@ -78,7 +78,7 @@ export default async function HomePage() {
           </CardContent>
         </Card>
         <div className="pt-12">
-          <p className="text-center text-[10px] text-muted-foreground">
+          <p className="text-center text-xs text-muted-foreground">
             Property of{" "}
             <a
               href="https://linkedin.com/in/petrit-halabaku"
