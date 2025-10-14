@@ -79,7 +79,15 @@ export default async function HomePage() {
         </Card>
         <div className="pt-12">
           <p className="text-center text-[10px] text-muted-foreground">
-            Property of Petrit Halabaku
+            Property of{" "}
+            <a
+              href="https://linkedin.com/in/petrit-halabaku"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-foreground"
+            >
+              Petrit Halabaku
+            </a>
           </p>
         </div>
       </div>
