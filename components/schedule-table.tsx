@@ -214,7 +214,10 @@ export function ScheduleTable({ schedules }: ScheduleTableProps) {
                     O
                   </TableCell> */}
                   <TableCell className="border border-border text-center text-base">
-                    <Badge variant="secondary" className="flex w-full flex-col">
+                    <Badge
+                      variant="secondary"
+                      className="flex w-fit justify-center items-center flex-col"
+                    >
                       <span className="text-sm">
                         {getSessionLabelFromCode(schedule?.courses?.code)}
                       </span>
