@@ -1,5 +1,5 @@
 
-name: Stage: build, migrate & deploy
+name: "Stage: build, migrate & deploy"
 
 on:
   push:
