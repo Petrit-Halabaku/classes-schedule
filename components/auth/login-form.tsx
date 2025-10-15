@@ -93,16 +93,16 @@ export function LoginForm() {
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sign in
           </Button>
-          {/* <div className="text-center">
-            <Button
+          <div className="text-center">
+            {/* <Button
               type="button"
               variant="link"
               onClick={() => router.push("/signup")}
               className="text-sm"
             >
               Don't have an account? Create one
-            </Button>
-          </div> */}
+            </Button> */}
+          </div>
         </form>
       </CardContent>
     </Card>
