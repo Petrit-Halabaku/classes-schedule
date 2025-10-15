@@ -1,18 +1,105 @@
 
+# name: "Stage: build, migrate & deploy"
+
+# on:
+#   push:
+#     branches: [ stage ]
+#   pull_request:
+#     branches: [ stage ]
+#     types: [ closed ]
+
+# jobs:
+#   stage-pipeline:
+#     # Run on direct pushes to stage, or when a PR into stage is merged
+#     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+
+#       - name: Use Node.js 20
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 20
+#           cache: pnpm
+
+#       - name: Setup pnpm
+#         uses: pnpm/action-setup@v4
+#         with:
+#           version: 9
+#           run_install: false
+
+#       - name: Install dependencies
+#         run: pnpm install --frozen-lockfile
+
+#       - name: Run checks (lint/tests if present)
+#         run: |
+#           pnpm lint --if-present
+#           pnpm test --if-present
+
+#       # ---------- Optional: Supabase migrations on staging ----------
+#       # This will run only if the required secrets are present.
+#       - name: Setup Supabase CLI
+#         if: ${{ secrets.SUPABASE_ACCESS_TOKEN != '' && secrets.SUPABASE_PROJECT_REF != '' }}
+#         uses: supabase/setup-cli@v1
+#         with:
+#           version: latest
+
+#       - name: Run DB migrations (staging)
+#         if: ${{ secrets.SUPABASE_ACCESS_TOKEN != '' && secrets.SUPABASE_PROJECT_REF != '' }}
+#         env:
+#           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+#         run: |
+#           supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
+#           # If your project requires a DB URL/password, uncomment the next line and set SUPABASE_DB_URL in repo secrets
+#           # supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}" --db-url "${{ secrets.SUPABASE_DB_URL }}"
+#           supabase db push
+#       # --------------------------------------------------------------
+
+#       - name: Build
+#         env:
+#           NEXT_TELEMETRY_DISABLED: 1
+#           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+#           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+#         run: pnpm build
+
+#       - name: Deploy to Netlify (staging alias)
+#         run: npx netlify deploy --build --alias=stage
+#         env:
+#           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
+#           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
 name: "Stage: build, migrate & deploy"
 
 on:
-  push:
-    branches: [ stage ]
   pull_request:
     branches: [ stage ]
     types: [ closed ]
 
 jobs:
   stage-pipeline:
-    # Run on direct pushes to stage, or when a PR into stage is merged
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.base.ref == 'stage' &&
+      github.event.pull_request.head.ref == 'develop'
     runs-on: ubuntu-latest
+
+    env:
+      # App env
+      NEXT_TELEMETRY_DISABLED: 1
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      # Supabase (optional for migrations)
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+
+      # Netlify
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
+      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
     steps:
       - name: Checkout
@@ -38,35 +125,26 @@ jobs:
           pnpm lint --if-present
           pnpm test --if-present
 
-      # ---------- Optional: Supabase migrations on staging ----------
-      # This will run only if the required secrets are present.
+      # ---------- Supabase migrations on staging (optional) ----------
       - name: Setup Supabase CLI
-        if: ${{ secrets.SUPABASE_ACCESS_TOKEN != '' && secrets.SUPABASE_PROJECT_REF != '' }}
+        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
         uses: supabase/setup-cli@v1
         with:
           version: latest
 
       - name: Run DB migrations (staging)
-        if: ${{ secrets.SUPABASE_ACCESS_TOKEN != '' && secrets.SUPABASE_PROJECT_REF != '' }}
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
         run: |
-          supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
-          # If your project requires a DB URL/password, uncomment the next line and set SUPABASE_DB_URL in repo secrets
-          # supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}" --db-url "${{ secrets.SUPABASE_DB_URL }}"
+          if [ -n "${SUPABASE_DB_URL}" ]; then
+            supabase link --project-ref "${SUPABASE_PROJECT_REF}" --db-url "${SUPABASE_DB_URL}"
+          else
+            supabase link --project-ref "${SUPABASE_PROJECT_REF}"
+          fi
           supabase db push
       # --------------------------------------------------------------
 
       - name: Build
-        env:
-          NEXT_TELEMETRY_DISABLED: 1
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
         run: pnpm build
 
       - name: Deploy to Netlify (staging alias)
         run: npx netlify deploy --build --alias=stage
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-
