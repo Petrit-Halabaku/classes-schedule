@@ -3,9 +3,81 @@ name: "Stage: build, migrate & deploy"
 on:
   pull_request:
     branches: [ stage ]
-    types: [ closed ]
+    types: [ opened, synchronize, reopened, closed ]
 
 jobs:
+  pr-checks:
+    if: >
+      github.event_name == 'pull_request' &&
+      (github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.action == 'reopened')
+    runs-on: ubuntu-latest
+
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Verify pnpm
+        run: pnpm --version
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (no deploy)
+        run: pnpm build
+
+      - name: Supabase public API health
+        if: ${{ env.NEXT_PUBLIC_SUPABASE_URL != '' && env.NEXT_PUBLIC_SUPABASE_ANON_KEY != '' }}
+        run: |
+          set -e
+          echo "Checking ${NEXT_PUBLIC_SUPABASE_URL}/auth/v1/health"
+          curl -sS "${NEXT_PUBLIC_SUPABASE_URL}/auth/v1/health" | grep -E '"status"\s*:\s*"ok"' >/dev/null
+          echo "Auth health OK"
+
+      - name: Supabase REST reachability (smoke test)
+        if: ${{ env.NEXT_PUBLIC_SUPABASE_URL != '' && env.NEXT_PUBLIC_SUPABASE_ANON_KEY != '' }}
+        run: |
+          # We only verify connectivity; we don't fail on HTTP status here
+          curl -sS -H "apikey: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}" -H "Authorization: Bearer ${NEXT_PUBLIC_SUPABASE_ANON_KEY}" \
+            "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/?select=1" || true
+
+      - name: Setup Supabase CLI (optional)
+        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Verify Supabase link (optional)
+        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
+        run: |
+          set -e
+          if [ -n "${SUPABASE_DB_URL}" ]; then
+            supabase link --project-ref "${SUPABASE_PROJECT_REF}" --db-url "${SUPABASE_DB_URL}"
+          else
+            supabase link --project-ref "${SUPABASE_PROJECT_REF}"
+          fi
+          echo "Supabase CLI link succeeded"
+
   stage-pipeline:
     if: >
       github.event_name == 'pull_request' &&
@@ -59,21 +131,21 @@ jobs:
           pnpm test --if-present
 
       # # ---------- Supabase migrations on staging (optional) ----------
-      # - name: Setup Supabase CLI
-      #   if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
-      #   uses: supabase/setup-cli@v1
-      #   with:
-      #     version: latest
+      - name: Setup Supabase CLI
+        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
-      # - name: Run DB migrations (staging)
-      #   if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
-      #   run: |
-      #     if [ -n "${SUPABASE_DB_URL}" ]; then
-      #       supabase link --project-ref "${SUPABASE_PROJECT_REF}" --db-url "${SUPABASE_DB_URL}"
-      #     else
-      #       supabase link --project-ref "${SUPABASE_PROJECT_REF}"
-      #     fi
-      #     supabase db push
+      - name: Run DB migrations (staging)
+        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
+        run: |
+          if [ -n "${SUPABASE_DB_URL}" ]; then
+            supabase link --project-ref "${SUPABASE_PROJECT_REF}" --db-url "${SUPABASE_DB_URL}"
+          else
+            supabase link --project-ref "${SUPABASE_PROJECT_REF}"
+          fi
+          supabase db push
       # # --------------------------------------------------------------
 
       - name: Build
