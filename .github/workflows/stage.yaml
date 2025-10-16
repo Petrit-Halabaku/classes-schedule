@@ -1,55 +1,38 @@
-
-
-name: Stage Build 
+name: "Stage: Build and deploy to Netlify"
 
 on:
-  # "On merge" to stage is effectively a push to the stage branch after a PR is merged
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - stage
-  # allow manual runs
-  workflow_dispatch:
 
 jobs:
-  build:
-    name: Build app on stage
+  build-and-deploy:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20.x
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Enable Corepack and setup pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@latest --activate
-          pnpm --version
+          node-version: 20
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
-      - name: Build
+      - name: Build site
         env:
-          # Add all runtime env vars your build needs here
+          NEXT_TELEMETRY_DISABLED: 1
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          # SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }} # if you actually need it during build
-        run: pnpm build
+        run: npm run build
 
-      - name: Upload build artifacts (Next.js)
-        uses: actions/upload-artifact@v4
-        with:
-          name: next-build
-          path: |
-            .next
-            out
-            dist
-          if-no-files-found: warn
+      - name: Deploy to Netlify
+        run: npx netlify deploy --build --prod
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
