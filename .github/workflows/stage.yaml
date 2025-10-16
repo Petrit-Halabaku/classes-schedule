@@ -1,157 +1,55 @@
-name: "Stage: build, migrate & deploy"
+
+
+name: Stage Build 
 
 on:
-  pull_request:
-    branches: [ stage ]
-    types: [ opened, synchronize, reopened, closed ]
+  # "On merge" to stage is effectively a push to the stage branch after a PR is merged
+  push:
+    branches:
+      - stage
+  # allow manual runs
+  workflow_dispatch:
 
 jobs:
-  pr-checks:
-    if: >
-      github.event_name == 'pull_request' &&
-      (github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.action == 'reopened')
+  build:
+    name: Build app on stage
     runs-on: ubuntu-latest
-
-    env:
-      NEXT_TELEMETRY_DISABLED: 1
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+    permissions:
+      contents: read
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: Setup Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: pnpm
+          node-version: '20'
+          cache: 'pnpm'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          run_install: false
-
-      - name: Verify pnpm
-        run: pnpm --version
+      - name: Enable Corepack and setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+          pnpm --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Build (no deploy)
-        run: pnpm build
-
-      - name: Supabase public API health
-        if: ${{ env.NEXT_PUBLIC_SUPABASE_URL != '' && env.NEXT_PUBLIC_SUPABASE_ANON_KEY != '' }}
-        run: |
-          set -e
-          echo "Checking ${NEXT_PUBLIC_SUPABASE_URL}/auth/v1/health"
-          curl -sS "${NEXT_PUBLIC_SUPABASE_URL}/auth/v1/health" | grep -E '"status"\s*:\s*"ok"' >/dev/null
-          echo "Auth health OK"
-
-      - name: Supabase REST reachability (smoke test)
-        if: ${{ env.NEXT_PUBLIC_SUPABASE_URL != '' && env.NEXT_PUBLIC_SUPABASE_ANON_KEY != '' }}
-        run: |
-          # We only verify connectivity; we don't fail on HTTP status here
-          curl -sS -H "apikey: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}" -H "Authorization: Bearer ${NEXT_PUBLIC_SUPABASE_ANON_KEY}" \
-            "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/?select=1" || true
-
-      - name: Setup Supabase CLI (optional)
-        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Verify Supabase link (optional)
-        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
-        run: |
-          set -e
-          if [ -n "${SUPABASE_DB_URL}" ]; then
-            supabase link --project-ref "${SUPABASE_PROJECT_REF}" --db-url "${SUPABASE_DB_URL}"
-          else
-            supabase link --project-ref "${SUPABASE_PROJECT_REF}"
-          fi
-          echo "Supabase CLI link succeeded"
-
-  stage-pipeline:
-    if: >
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.merged == true &&
-      github.event.pull_request.base.ref == 'stage' &&
-      github.event.pull_request.head.ref == 'develop'
-    runs-on: ubuntu-latest
-
-    env:
-      # App env
-      NEXT_TELEMETRY_DISABLED: 1
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-
-      # Supabase (optional for migrations)
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-
-      # Netlify
-      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
-      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # Setup Node first (enables pnpm cache)
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install pnpm manually
-        run: npm install -g pnpm
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          run_install: false
-
-      - name: Verify pnpm
-        run: pnpm --version
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run checks (lint/tests if present)
-        run: |
-          pnpm lint --if-present
-          pnpm test --if-present
-
-      # # ---------- Supabase migrations on staging (optional) ----------
-      - name: Setup Supabase CLI
-        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Run DB migrations (staging)
-        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
-        run: |
-          if [ -n "${SUPABASE_DB_URL}" ]; then
-            supabase link --project-ref "${SUPABASE_PROJECT_REF}" --db-url "${SUPABASE_DB_URL}"
-          else
-            supabase link --project-ref "${SUPABASE_PROJECT_REF}"
-          fi
-          supabase db push
-      # # --------------------------------------------------------------
 
       - name: Build
+        env:
+          # Add all runtime env vars your build needs here
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          # SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }} # if you actually need it during build
         run: pnpm build
 
-      - name: Deploy to Netlify (staging alias)
-        run: npx netlify deploy --build --alias=stage
+      - name: Upload build artifacts (Next.js)
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: |
+            .next
+            out
+            dist
+          if-no-files-found: warn
