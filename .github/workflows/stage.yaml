@@ -131,21 +131,21 @@ jobs:
           pnpm test --if-present
 
       # # ---------- Supabase migrations on staging (optional) ----------
-      - name: Setup Supabase CLI
-        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
+      # - name: Setup Supabase CLI
+      #   if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
+      #   uses: supabase/setup-cli@v1
+      #   with:
+      #     version: latest
 
-      - name: Run DB migrations (staging)
-        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
-        run: |
-          if [ -n "${SUPABASE_DB_URL}" ]; then
-            supabase link --project-ref "${SUPABASE_PROJECT_REF}" --db-url "${SUPABASE_DB_URL}"
-          else
-            supabase link --project-ref "${SUPABASE_PROJECT_REF}"
-          fi
-          supabase db push
+      # - name: Run DB migrations (staging)
+      #   if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
+      #   run: |
+      #     if [ -n "${SUPABASE_DB_URL}" ]; then
+      #       supabase link --project-ref "${SUPABASE_PROJECT_REF}" --db-url "${SUPABASE_DB_URL}"
+      #     else
+      #       supabase link --project-ref "${SUPABASE_PROJECT_REF}"
+      #     fi
+      #     supabase db push
       # # --------------------------------------------------------------
 
       - name: Build
