@@ -112,7 +112,9 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      # Install pnpm and ensure it's on PATH
+      - name: Install pnpm manually
+        run: npm install -g pnpm
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
